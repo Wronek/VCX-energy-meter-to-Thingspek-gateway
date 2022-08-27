@@ -16,6 +16,10 @@
 #define REG_COUNT 10
 #define RXTX_PIN 2
 
+bool modbusOK=false;
+bool mb1Status=false;
+bool mb2Status=false;
+
 SoftwareSerial S(D2, D1);
 ModbusRTU mb;
 WiFiClient espClient;
@@ -27,7 +31,9 @@ bool cb(Modbus::ResultCode event, uint16_t transactionId, void* data) { // Callb
   if (event != Modbus::EX_SUCCESS) {
     Serial.print("Request result: 0x");
     Serial.print(event, HEX);
-  }
+    modbusOK=false;
+
+  }else modbusOK=true;
   return true;
 }
 
@@ -319,7 +325,7 @@ void loop() {
       mb.task();
       delay(10);
     }
-
+ mb1Status=modbusOK;
     union
    {
     uint32_t j;
@@ -344,6 +350,7 @@ void loop() {
       mb.task();
       delay(10);
     }
+    mb2Status=modbusOK;
 
         Serial.println("Rejestry");
     Serial.println(res[0]);
@@ -360,67 +367,24 @@ void loop() {
 
 
 
-    
+    if(mb1Status&&mb2Status==1){
   int x = ThingSpeak.writeFields(sett.chanID, sett.s); //Write Api kay is in S variable
   if(x == 200){
     Serial.println("Channel update successful.");
   }
   else{
     Serial.println("Problem updating channel. HTTP error code " + String(x));
-  }
+  }}
 
-  //ThingSpeak.setField(3, number3);
- // ThingSpeak.setField(4, number4);
-  }
+
   }
   }
-
-
-
-
-
-/*   
-    if(digitalRead(HIGH_LVL_PIN)==0&&notification_1==0){
-      notification_1=1;
-     // Pushover po = Pushover(sett.s,sett.usr_key, UNSAFE); 
-       po.setDevice("test");
-       po.setMessage(sett.com1);
-       po.setSound("default");
-       Serial.println(po.send());
-     }
-    if(notification_1==1&&digitalRead(HIGH_LVL_PIN)==1){notification_1=0;}
-    
-    if(digitalRead(HIGH_LVL_PIN)==1&&notification_1_1==0){
-      notification_1_1=1;
-     // Pushover po = Pushover(sett.s,sett.usr_key, UNSAFE); 
-       po.setDevice("test");
-       po.setMessage(sett.com11);
-       po.setSound("default");
-       Serial.println(po.send());
-     }
-    if(notification_1==1&&digitalRead(HIGH_LVL_PIN)==0){notification_1_1=0;}
-///////////////////////////////////////////////////////////////////////////////////////////
-        if(digitalRead(LOW_LVL_PIN)==0&&notification_2==0){
-      notification_2=1;
-     // Pushover po = Pushover(sett.s,sett.usr_key, UNSAFE); 
-       po.setDevice("test");
-       po.setMessage(sett.com2);
-       po.setSound("default");
-       Serial.println(po.send());
-     }
-    if(notification_2==1&&digitalRead(LOW_LVL_PIN)==1){notification_2=0;}
-    //////////////////////////////////////////////////
-    if(digitalRead(LOW_LVL_PIN)==1&&notification_2_1==0){
-      notification_2_1=1;
-     // Pushover po = Pushover(sett.s,sett.usr_key, UNSAFE); 
-    //  po.setDevice("test");
-      // po.setMessage(sett.com21);
-      // po.setSound("default");
-      // Serial.println(po.send());
-     }
-    if(notification_2_1==1&&digitalRead(LOW_LVL_PIN)==0){notification_2_1=0;}    
-    
   }
-*/
+
+
+
+
+
+
   ArduinoOTA.handle();  
 }
