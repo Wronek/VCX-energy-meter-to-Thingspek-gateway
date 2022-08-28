@@ -147,25 +147,25 @@ void setup() {
 
         IPAddress ip(sett.ip);
         IPAddressParameter param_ip("ip", "param_ip", ip);
-WiFiManagerParameter custom_text1("<p>Proszę uzupełnić parametry powiadomien Pushover</p>");
+WiFiManagerParameter custom_text1("<p>Uzupełni parametry kanału Thingspeak, a także interwał pomiędzy odczytami</p>");
 wm.addParameter(&custom_text1);
-        wm.addParameter( &param_str );
+       // wm.addParameter( &param_str );
         WiFiManagerParameter custom_text3("<p>Proszę uzupełnić channel ID</p>");
         wm.addParameter(&custom_text3);
         wm.addParameter( &param_chanID );
-        wm.addParameter( &param_user_key );
-        wm.addParameter( &param_text1 );
-        wm.addParameter( &param_text11 );
-        wm.addParameter( &param_text2 );
-        wm.addParameter( &param_text21 );
-        wm.addParameter( &param_float );
+        //wm.addParameter( &param_user_key );
+       // wm.addParameter( &param_text1 );
+      //  wm.addParameter( &param_text11 );
+      //  wm.addParameter( &param_text2 );
+       // wm.addParameter( &param_text21 );
+      //  wm.addParameter( &param_float );
 WiFiManagerParameter custom_text2("<p>Proszę podać czas próbkowania(czas pomiędzy sprawdzeniami)(s)</p>");
 wm.addParameter(&custom_text2);        
         wm.addParameter( &param_int );
-        wm.addParameter( &param_ip );
-        WiFiManagerParameter custom_text("<p>This is just a text paragraph</p>");
-wm.addParameter(&custom_text);
-Serial.println("Linijka przed commit");
+       // wm.addParameter( &param_ip );
+      //  WiFiManagerParameter custom_text("<p>This is just a text paragraph</p>");
+//wm.addParameter(&custom_text);
+//Serial.println("Linijka przed commit");
         //SSID & password parameters already included
         wm.startConfigPortal();
 Serial.println("Linijka przed commit");
@@ -302,7 +302,7 @@ void loop() {
   //Serial.begin(115200);
   //WiFi.begin("myNetwork", "secureWPAKii");
   while (WiFi.status() != WL_CONNECTED) delay(50);
-  Serial.println("Connected");
+  Serial.println("Connected to Wi-Fi network");
 /*  
   Pushover po = Pushover(sett.s,sett.usr_key, UNSAFE);
   po.setDevice("test");
@@ -331,17 +331,20 @@ void loop() {
     uint32_t j;
     float f;
    }u;
-    Serial.println("Rejestry2");
-    Serial.println(res[0]);
-    Serial.println(res[1]);
+   // Serial.println("Rejestry2");
+    //Serial.println(res[0]);
+   // Serial.println(res[1]);
     Serial.println("float");
     u.j =((unsigned long)res[0] << 16) | res[1]; //A phase active power
+    Serial.println("Moc faza A");
     Serial.println(u.f);
     ThingSpeak.setField(1,u.f );
     u.j =(((unsigned long)res[2] << 16) | res[3])+(((unsigned long)res[4] << 16) | res[5]); //B+C phase active power
+    Serial.println("Moc faza B+C");
     Serial.println(u.f);
     ThingSpeak.setField(2,u.f );
     u.j =((unsigned long)res[6] << 16) | res[7]; //total active power
+    Serial.println("Moc całkowita");
     Serial.println(u.f);
     ThingSpeak.setField(3,u.f );
       if (!mb.slave()) {    // Check if no transaction in progress
@@ -352,10 +355,11 @@ void loop() {
     }
     mb2Status=modbusOK;
 
-        Serial.println("Rejestry");
-    Serial.println(res[0]);
-    Serial.println(res[1]);
+      //  Serial.println("Rejestry");
+    //Serial.println(res[0]);
+   // Serial.println(res[1]);
     u.j =((unsigned long)res[0] << 16) | res[1]; //Positive active power kWh
+    Serial.println("Zużycie całkowite");
     Serial.println(u.f);
     ThingSpeak.setField(4,u.f );
 
@@ -369,8 +373,9 @@ void loop() {
 
     if(mb1Status&&mb2Status==1){
   int x = ThingSpeak.writeFields(sett.chanID, sett.s); //Write Api kay is in S variable
+  Serial.println("Odczyt Modbus przebeigł pomyślnie");
   if(x == 200){
-    Serial.println("Channel update successful.");
+    Serial.println("Thingspeak Channel update successful.");
   }
   else{
     Serial.println("Problem updating channel. HTTP error code " + String(x));
